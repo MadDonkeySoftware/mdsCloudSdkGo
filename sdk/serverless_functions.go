@@ -18,6 +18,7 @@ import (
 type ServerlessFunctionsClient struct {
 	serviceURL     string
 	defaultAccount string
+	authManager    *AuthManager
 }
 
 // ServerlessFunctionSummary Function summary details
@@ -48,6 +49,11 @@ func (c *ServerlessFunctionsClient) Initialize(url string, account string) {
 func (c *ServerlessFunctionsClient) CreateFunction(name string) (*ServerlessFunctionSummary, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
 
+	token, err := c.authManager.GetAuthenticationToken(nil)
+	if err != nil {
+		return nil, errors.New("Could not acquire authentication token")
+	}
+
 	body := []byte(fmt.Sprintf(`{"name":"%s"}`, name))
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/create", c.serviceURL), bytes.NewBuffer(body))
 	if err != nil {
@@ -56,6 +62,7 @@ func (c *ServerlessFunctionsClient) CreateFunction(name string) (*ServerlessFunc
 
 	req.Header.Set("Account", c.defaultAccount)
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
 		return nil, errors.New("Could not execute request to create new function")
@@ -90,12 +97,18 @@ func (c *ServerlessFunctionsClient) CreateFunction(name string) (*ServerlessFunc
 func (c *ServerlessFunctionsClient) ListFunctions() (*[]ServerlessFunctionSummary, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
 
+	token, err := c.authManager.GetAuthenticationToken(nil)
+	if err != nil {
+		return nil, errors.New("Could not acquire authentication token")
+	}
+
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v1/list", c.serviceURL), nil)
 	if err != nil {
 		return nil, errors.New("Could not build request to fetch list of functions from API")
 	}
 
 	req.Header.Set("Account", c.defaultAccount)
+	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
 		return nil, errors.New("Could not execute request to fetch list of functions from serverless functions API")
@@ -124,12 +137,18 @@ func (c *ServerlessFunctionsClient) ListFunctions() (*[]ServerlessFunctionSummar
 func (c *ServerlessFunctionsClient) DeleteFunction(orid string) error {
 	client := &http.Client{Timeout: 10 * time.Second}
 
+	token, err := c.authManager.GetAuthenticationToken(nil)
+	if err != nil {
+		return errors.New("Could not acquire authentication token")
+	}
+
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/v1/%s", c.serviceURL, orid), nil)
 	if err != nil {
 		return errors.New("Could not build request to delete function")
 	}
 
 	req.Header.Set("Account", c.defaultAccount)
+	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
 		return errors.New("Could not execute request to delete function")
@@ -149,6 +168,11 @@ func (c *ServerlessFunctionsClient) DeleteFunction(orid string) error {
 func (c *ServerlessFunctionsClient) InvokeFunction(orid string, body interface{}) (interface{}, error) {
 	client := &http.Client{Timeout: 30 * time.Minute}
 
+	token, err := c.authManager.GetAuthenticationToken(nil)
+	if err != nil {
+		return nil, errors.New("Could not acquire authentication token")
+	}
+
 	bodyBytes, _ := json.Marshal(body)
 	payload := bytes.NewReader(bodyBytes)
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/invoke/%s", c.serviceURL, orid), payload)
@@ -158,6 +182,7 @@ func (c *ServerlessFunctionsClient) InvokeFunction(orid string, body interface{}
 
 	req.Header.Set("Account", c.defaultAccount)
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
 		return nil, errors.New("Could not execute request to invoke function")
@@ -181,12 +206,18 @@ func (c *ServerlessFunctionsClient) InvokeFunction(orid string, body interface{}
 func (c *ServerlessFunctionsClient) GetFunctionDetails(orid string) (*ServerlessFunctionDetails, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
 
+	token, err := c.authManager.GetAuthenticationToken(nil)
+	if err != nil {
+		return nil, errors.New("Could not acquire authentication token")
+	}
+
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v1/inspect/%s", c.serviceURL, orid), nil)
 	if err != nil {
 		return nil, errors.New("Could not build request to fetch function from API")
 	}
 
 	req.Header.Set("Account", c.defaultAccount)
+	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
 		return nil, errors.New("Could not execute request to fetch function from serverless functions API")
@@ -224,6 +255,11 @@ func (c *ServerlessFunctionsClient) GetFunctionDetails(orid string) (*Serverless
 func (c *ServerlessFunctionsClient) UpdateFunctionCode(orid string, runtime string, entryPoint string, sourcePathOrFile string) error {
 	client := &http.Client{Timeout: 30 * time.Minute}
 
+	token, err := c.authManager.GetAuthenticationToken(nil)
+	if err != nil {
+		return errors.New("Could not acquire authentication token")
+	}
+
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
 	file, err := os.Open(sourcePathOrFile)
@@ -248,6 +284,7 @@ func (c *ServerlessFunctionsClient) UpdateFunctionCode(orid string, runtime stri
 
 	req.Header.Set("Account", c.defaultAccount)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
 		return errors.New("Could not execute request to create new function")

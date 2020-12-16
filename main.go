@@ -61,8 +61,20 @@ func testServerlessFunctions(client *sdk.ServerlessFunctionsClient) {
 }
 
 func main() {
-	sdkObj := sdk.NewSdk("1", map[string]string{"sfUrl": "http://192.168.5.90:8086"})
-	client := sdkObj.GetServerlessFunctionsClient("", "")
+	account := ""
+	userID := ""
+	password := ""
+	allowSelfCert := true
+	urls := map[string]string{
+		"identityUrl": "https://192.168.5.90:8081",
+		"nsUrl":       "http://192.168.5.90:8082",
+		"qsUrl":       "http://192.168.5.90:8083",
+		"fsUrl":       "http://192.168.5.90:8084",
+		"sfUrl":       "http://192.168.5.90:8085",
+		"smUrl":       "http://192.168.5.90:8086",
+	}
+	sdkObj := sdk.NewSdk(account, userID, password, allowSelfCert, urls)
+	client := sdkObj.GetServerlessFunctionsClient()
 
 	testServerlessFunctions(client)
 }
