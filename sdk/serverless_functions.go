@@ -16,9 +16,8 @@ import (
 
 // ServerlessFunctionsClient Client to interact with MDS Cloud serverless functions
 type ServerlessFunctionsClient struct {
-	serviceURL     string
-	defaultAccount string
-	authManager    *AuthManager
+	serviceURL  string
+	authManager *AuthManager
 }
 
 // ServerlessFunctionSummary Function summary details
@@ -39,12 +38,6 @@ type ServerlessFunctionDetails struct {
 	LastInvoke string
 }
 
-// Initialize Initializes this client with the provided values
-func (c *ServerlessFunctionsClient) Initialize(url string, account string) {
-	c.serviceURL = url
-	c.defaultAccount = account
-}
-
 // CreateFunction Create a new serverless function
 func (c *ServerlessFunctionsClient) CreateFunction(name string) (*ServerlessFunctionSummary, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
@@ -60,7 +53,6 @@ func (c *ServerlessFunctionsClient) CreateFunction(name string) (*ServerlessFunc
 		return nil, errors.New("Could not build request to create new function")
 	}
 
-	req.Header.Set("Account", c.defaultAccount)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Token", token)
 	r, err := client.Do(req)
@@ -107,7 +99,6 @@ func (c *ServerlessFunctionsClient) ListFunctions() (*[]ServerlessFunctionSummar
 		return nil, errors.New("Could not build request to fetch list of functions from API")
 	}
 
-	req.Header.Set("Account", c.defaultAccount)
 	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
@@ -147,7 +138,6 @@ func (c *ServerlessFunctionsClient) DeleteFunction(orid string) error {
 		return errors.New("Could not build request to delete function")
 	}
 
-	req.Header.Set("Account", c.defaultAccount)
 	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
@@ -180,7 +170,6 @@ func (c *ServerlessFunctionsClient) InvokeFunction(orid string, body interface{}
 		return nil, errors.New("Could not build request to invoke function")
 	}
 
-	req.Header.Set("Account", c.defaultAccount)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Token", token)
 	r, err := client.Do(req)
@@ -216,7 +205,6 @@ func (c *ServerlessFunctionsClient) GetFunctionDetails(orid string) (*Serverless
 		return nil, errors.New("Could not build request to fetch function from API")
 	}
 
-	req.Header.Set("Account", c.defaultAccount)
 	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
@@ -282,7 +270,6 @@ func (c *ServerlessFunctionsClient) UpdateFunctionCode(orid string, runtime stri
 		return errors.New("Could not build request to create new function")
 	}
 
-	req.Header.Set("Account", c.defaultAccount)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	req.Header.Set("Token", token)
 	r, err := client.Do(req)

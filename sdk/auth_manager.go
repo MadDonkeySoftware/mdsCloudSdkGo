@@ -84,8 +84,6 @@ func (am *AuthManager) GetAuthenticationToken(overrides map[string]string) (stri
 }
 
 func (am *AuthManager) getNewToken(account string, userName string, password string) (string, error) {
-
-	fmt.Printf("Fetching new authentication token...\r\n")
 	var client *http.Client
 
 	if am.allowSelfSignCert {

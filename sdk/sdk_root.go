@@ -2,6 +2,7 @@ package sdk
 
 // Sdk Object to interact with various MDS Cloud resources
 type Sdk struct {
+	identityURL        string
 	qsURL              string
 	smURL              string
 	fsURL              string
@@ -9,6 +10,7 @@ type Sdk struct {
 	sfURL              string
 	defaultAccount     string
 	defaultAuthManager *AuthManager
+	allowSelfCert      bool
 }
 
 // NewSdk Creates a new SDK object
@@ -19,6 +21,7 @@ type Sdk struct {
 // allowSelfCert - Allow HTTPS authentication when self-signed certificate used
 //
 // urls          - Key value map for various clients to act against.
+//   identityUrl - identity service url
 //   qsUrl       - queue service url
 //   smUrl       - state machine service url
 //   fsUrl       - file service url
@@ -34,23 +37,56 @@ func NewSdk(account string, userID string, password string, allowSelfCert bool, 
 		allowSelfCert,
 	)
 	sdk := Sdk{
-		qsURL: urls["qsUrl"],
-		smURL: urls["smUrl"],
-		fsURL: urls["fsUrl"],
-		nsURL: urls["nsUrl"],
-		sfURL: urls["sfUrl"],
+		identityURL: urls["identityUrl"],
+		qsURL:       urls["qsUrl"],
+		smURL:       urls["smUrl"],
+		fsURL:       urls["fsUrl"],
+		nsURL:       urls["nsUrl"],
+		sfURL:       urls["sfUrl"],
 	}
 	sdk.defaultAccount = account
 	sdk.defaultAuthManager = authManager
+	sdk.allowSelfCert = allowSelfCert
 	return &sdk
 }
 
 // GetServerlessFunctionsClient Gets a new serverless function client
 func (s *Sdk) GetServerlessFunctionsClient() *ServerlessFunctionsClient {
-	client := ServerlessFunctionsClient{
-		serviceURL:     s.sfURL,
-		defaultAccount: s.defaultAccount,
-		authManager:    s.defaultAuthManager,
+	return &ServerlessFunctionsClient{
+		serviceURL:  s.sfURL,
+		authManager: s.defaultAuthManager,
 	}
-	return &client
+}
+
+// GetIdentityClient Gets a new identity client
+func (s *Sdk) GetIdentityClient() *IdentityClient {
+	return &IdentityClient{
+		allowSelfSignCert: s.allowSelfCert,
+		authManager:       s.defaultAuthManager,
+		identityURL:       s.identityURL,
+	}
+}
+
+// GetQueueServiceClient Gets a new queue service client
+func (s *Sdk) GetQueueServiceClient() *QueueServiceClient {
+	return &QueueServiceClient{
+		authManager:     s.defaultAuthManager,
+		queueServiceURL: s.qsURL,
+	}
+}
+
+// GetFileServiceClient Gets a new file service client
+func (s *Sdk) GetFileServiceClient() *FileServiceClient {
+	return &FileServiceClient{
+		authManager:    s.defaultAuthManager,
+		fileServiceURL: s.fsURL,
+	}
+}
+
+// GetStateMachineServiceClient Gets a new state machine service client
+func (s *Sdk) GetStateMachineServiceClient() *StateMachineServiceClient {
+	return &StateMachineServiceClient{
+		authManager:            s.defaultAuthManager,
+		stateMachineServiceURL: s.smURL,
+	}
 }
