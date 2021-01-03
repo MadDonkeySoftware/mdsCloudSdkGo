@@ -194,7 +194,7 @@ func (qs *QueueServiceClient) UpdateQueue(data *UpdateQueueArgs) error {
 
 	postPayload := &updateQueuePayload{}
 	if data.Resource == "NULL" {
-		postPayload.Resource = nil
+		postPayload.Resource = ""
 	} else {
 		postPayload.Resource = data.Resource
 	}

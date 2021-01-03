@@ -280,6 +280,18 @@ func (c *ServerlessFunctionsClient) UpdateFunctionCode(orid string, runtime stri
 
 	switch r.StatusCode {
 	case 201:
+		result := make(map[string]interface{})
+		err = json.NewDecoder(r.Body).Decode(&result)
+		if err != nil {
+			fmt.Println(err)
+			return errors.New("Could not decode response from API of resource")
+		}
+
+		buildStatus := result["status"].(string)
+		if buildStatus == "buildFailed" {
+			return errors.New("function failed to build")
+		}
+
 		return nil
 	case 400:
 		body, _ := ioutil.ReadAll(r.Body)

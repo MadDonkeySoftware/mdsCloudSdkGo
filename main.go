@@ -311,6 +311,7 @@ func testStateMachineServiceClient(client *sdk.StateMachineServiceClient) {
 }
 
 func main() {
+	enableAuthSemaphore := false
 	allowSelfCert := true
 	urls := map[string]string{
 		"identityUrl": "https://127.0.0.1:8081",
@@ -320,13 +321,13 @@ func main() {
 		"sfUrl":       "http://127.0.0.1:8085",
 		"smUrl":       "http://127.0.0.1:8086",
 	}
-	sdkObj := sdk.NewSdk("", "", "", allowSelfCert, urls)
+	sdkObj := sdk.NewSdk("", "", "", allowSelfCert, enableAuthSemaphore, urls)
 	testCreds := createTestAccount(sdkObj.GetIdentityClient())
 
-	sdkObj = sdk.NewSdk(testCreds.AccountID, testCreds.UserName, testCreds.Password, allowSelfCert, urls)
+	sdkObj = sdk.NewSdk(testCreds.AccountID, testCreds.UserName, testCreds.Password, allowSelfCert, enableAuthSemaphore, urls)
 	testIdentityClient(sdkObj.GetIdentityClient(), testCreds)
 	// testServerlessFunctions(sdkObj.GetServerlessFunctionsClient())
-	// testQueueServiceClient(sdkObj.GetQueueServiceClient())
+	testQueueServiceClient(sdkObj.GetQueueServiceClient())
 	// testFileServiceClient(sdkObj.GetFileServiceClient())
-	testStateMachineServiceClient(sdkObj.GetStateMachineServiceClient())
+	// testStateMachineServiceClient(sdkObj.GetStateMachineServiceClient())
 }

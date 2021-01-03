@@ -2,15 +2,16 @@ package sdk
 
 // Sdk Object to interact with various MDS Cloud resources
 type Sdk struct {
-	identityURL        string
-	qsURL              string
-	smURL              string
-	fsURL              string
-	nsURL              string
-	sfURL              string
-	defaultAccount     string
-	defaultAuthManager *AuthManager
-	allowSelfCert      bool
+	identityURL         string
+	qsURL               string
+	smURL               string
+	fsURL               string
+	nsURL               string
+	sfURL               string
+	defaultAccount      string
+	defaultAuthManager  *AuthManager
+	allowSelfCert       bool
+	enableAuthSemaphore bool
 }
 
 // NewSdk Creates a new SDK object
@@ -27,7 +28,7 @@ type Sdk struct {
 //   fsUrl       - file service url
 //   nsUrl       - notification service url
 //   sfUrl       - serverless function service url
-func NewSdk(account string, userID string, password string, allowSelfCert bool, urls map[string]string) *Sdk {
+func NewSdk(account string, userID string, password string, allowSelfCert bool, enableAuthSemaphore bool, urls map[string]string) *Sdk {
 	// TODO: document parameters
 	authManager := NewAuthManager(
 		urls["identityUrl"],
@@ -35,6 +36,7 @@ func NewSdk(account string, userID string, password string, allowSelfCert bool, 
 		password,
 		account,
 		allowSelfCert,
+		enableAuthSemaphore,
 	)
 	sdk := Sdk{
 		identityURL: urls["identityUrl"],
@@ -47,6 +49,7 @@ func NewSdk(account string, userID string, password string, allowSelfCert bool, 
 	sdk.defaultAccount = account
 	sdk.defaultAuthManager = authManager
 	sdk.allowSelfCert = allowSelfCert
+	sdk.enableAuthSemaphore = enableAuthSemaphore
 	return &sdk
 }
 

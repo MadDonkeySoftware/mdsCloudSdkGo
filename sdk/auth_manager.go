@@ -22,6 +22,7 @@ type AuthManager struct {
 	password          string
 	account           string
 	allowSelfSignCert bool
+	enableSemaphore   bool
 }
 
 func defaultIfNilOrEmpty(value interface{}, def interface{}) interface{} {
@@ -32,7 +33,7 @@ func defaultIfNilOrEmpty(value interface{}, def interface{}) interface{} {
 }
 
 // NewAuthManager Creates a new AuthManager client
-func NewAuthManager(identityURL string, userID string, password string, account string, allowSelfSignCert bool) *AuthManager {
+func NewAuthManager(identityURL string, userID string, password string, account string, allowSelfSignCert bool, enableSemaphore bool) *AuthManager {
 	manager := AuthManager{
 		cache:             NewInMemoryCache(),
 		identityURL:       identityURL,
@@ -40,13 +41,31 @@ func NewAuthManager(identityURL string, userID string, password string, account 
 		password:          password,
 		account:           account,
 		allowSelfSignCert: allowSelfSignCert,
+		enableSemaphore:   enableSemaphore,
 	}
 
 	return &manager
 }
 
+var semaphore = make(chan int, 1)
+
 // GetAuthenticationToken Gets an authentication token to use against the MDS apis
 func (am *AuthManager) GetAuthenticationToken(overrides map[string]string) (string, error) {
+
+	if am.enableSemaphore {
+		semaphore <- 1
+	}
+
+	data, err := am.getAuthenticationTokenWork(overrides)
+
+	if am.enableSemaphore {
+		<-semaphore
+	}
+
+	return data, err
+}
+
+func (am *AuthManager) getAuthenticationTokenWork(overrides map[string]string) (string, error) {
 	account := defaultIfNilOrEmpty(overrides["accountId"], am.account).(string)
 	user := defaultIfNilOrEmpty(overrides["userId"], am.userID).(string)
 	password := defaultIfNilOrEmpty(overrides["password"], am.password).(string)
@@ -104,7 +123,8 @@ func (am *AuthManager) getNewToken(account string, userName string, password str
 	req.Header.Set("Content-Type", "application/json")
 	r, err := client.Do(req)
 	if err != nil {
-		return "", errors.New("Could not execute request to authenticate user")
+		// return "", errors.New("Could not execute request to authenticate user")
+		return "", err
 	}
 	defer r.Body.Close()
 
