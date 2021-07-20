@@ -20,6 +20,7 @@ type QueueServiceClient struct {
 type CreateQueueArgs struct {
 	Name     string `json:"name"`
 	Resource string `json:"resource,omitempty"`
+	Dlq      string `json:"dlq,omitempty"`
 }
 
 // CreateQueueResult Create queue results
@@ -131,6 +132,7 @@ type GetQueueDetailsArgs struct {
 type GetQueueDetailsResult struct {
 	Orid     string `json:"orid"`
 	Resource string `json:"resource,omitempty"`
+	Dlq      string `json:"dlq,omitempty"`
 }
 
 // GetQueueDetails Gets details for the specified queue
@@ -182,6 +184,7 @@ func (qs *QueueServiceClient) GetQueueDetails(data *GetQueueDetailsArgs) (*GetQu
 type UpdateQueueArgs struct {
 	Orid     string `json:"orid"`
 	Resource string `json:"resource,omitempty"`
+	Dlq      string `json:"dlq,omitempty"`
 }
 
 // UpdateQueue Attempts to create a new queue with the MDS Cloud deployment
@@ -190,6 +193,7 @@ func (qs *QueueServiceClient) UpdateQueue(data *UpdateQueueArgs) error {
 
 	type updateQueuePayload struct {
 		Resource interface{} `json:"resource,omitempty"`
+		Dlq      interface{} `json:"dlq,omitempty"`
 	}
 
 	postPayload := &updateQueuePayload{}
@@ -197,6 +201,12 @@ func (qs *QueueServiceClient) UpdateQueue(data *UpdateQueueArgs) error {
 		postPayload.Resource = ""
 	} else {
 		postPayload.Resource = data.Resource
+	}
+
+	if data.Dlq == "NULL" {
+		postPayload.Dlq = ""
+	} else {
+		postPayload.Dlq = data.Dlq
 	}
 
 	body, err := json.Marshal(postPayload)
