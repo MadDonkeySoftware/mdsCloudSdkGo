@@ -240,7 +240,15 @@ func (c *ServerlessFunctionsClient) GetFunctionDetails(orid string) (*Serverless
 }
 
 // UpdateFunctionCode .
-func (c *ServerlessFunctionsClient) UpdateFunctionCode(orid string, runtime string, entryPoint string, sourcePathOrFile string) error {
+type UpdateFunctionCodeArgs struct {
+	Orid             string
+	Runtime          string
+	EntryPoint       string
+	SourcePathOrFile string
+	Context          string
+}
+
+func (c *ServerlessFunctionsClient) UpdateFunctionCode(data *UpdateFunctionCodeArgs) error {
 	client := &http.Client{Timeout: 30 * time.Minute}
 
 	token, err := c.authManager.GetAuthenticationToken(nil)
@@ -250,22 +258,27 @@ func (c *ServerlessFunctionsClient) UpdateFunctionCode(orid string, runtime stri
 
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
-	file, err := os.Open(sourcePathOrFile)
+	file, err := os.Open(data.SourcePathOrFile)
 	defer file.Close()
 
-	fileWriter, err := writer.CreateFormFile("sourceArchive", filepath.Base(sourcePathOrFile))
+	fileWriter, err := writer.CreateFormFile("sourceArchive", filepath.Base(data.SourcePathOrFile))
 	_, err = io.Copy(fileWriter, file)
 	if err != nil {
 		return err
 	}
-	_ = writer.WriteField("runtime", runtime)
-	_ = writer.WriteField("entryPoint", entryPoint)
+	_ = writer.WriteField("runtime", data.Runtime)
+	_ = writer.WriteField("entryPoint", data.EntryPoint)
+
+	if data.Context != "" {
+		_ = writer.WriteField("context", data.Context)
+	}
+
 	err = writer.Close()
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/uploadCode/%s", c.serviceURL, orid), payload)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/uploadCode/%s", c.serviceURL, data.Orid), payload)
 	if err != nil {
 		return errors.New("Could not build request to create new function")
 	}

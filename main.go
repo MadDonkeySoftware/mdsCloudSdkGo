@@ -78,7 +78,12 @@ func testServerlessFunctions(client *sdk.ServerlessFunctionsClient) {
 	fmt.Println()
 
 	fmt.Println("== Updating Code ==")
-	err = client.UpdateFunctionCode(funcSummary.Orid, "node", "src/one:main", sourcePath)
+	err = client.UpdateFunctionCode(&sdk.UpdateFunctionCodeArgs{
+		Orid:             funcSummary.Orid,
+		Runtime:          "node",
+		EntryPoint:       "src/one:main",
+		SourcePathOrFile: sourcePath,
+	})
 	if err != nil {
 		panic(err)
 	}
