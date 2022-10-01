@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 // QueueServiceClient Client to interact with the MDS Cloud queue service
@@ -32,7 +31,7 @@ type CreateQueueResult struct {
 
 // CreateQueue Attempts to create a new queue with the MDS Cloud deployment
 func (qs *QueueServiceClient) CreateQueue(data *CreateQueueArgs) (*CreateQueueResult, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	body, err := json.Marshal(data)
 	if err != nil {
@@ -90,7 +89,7 @@ type DeleteQueueArgs struct {
 
 // DeleteQueue Attempts to delete a queue from the MDS Cloud deployment
 func (qs *QueueServiceClient) DeleteQueue(data *DeleteQueueArgs) error {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/v1/queue/%s", qs.queueServiceURL, data.Orid), nil)
 	if err != nil {
@@ -137,7 +136,7 @@ type GetQueueDetailsResult struct {
 
 // GetQueueDetails Gets details for the specified queue
 func (qs *QueueServiceClient) GetQueueDetails(data *GetQueueDetailsArgs) (*GetQueueDetailsResult, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v1/queue/%s/details", qs.queueServiceURL, data.Orid), nil)
 	if err != nil {
@@ -189,7 +188,7 @@ type UpdateQueueArgs struct {
 
 // UpdateQueue Attempts to create a new queue with the MDS Cloud deployment
 func (qs *QueueServiceClient) UpdateQueue(data *UpdateQueueArgs) error {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	type updateQueuePayload struct {
 		Resource interface{} `json:"resource,omitempty"`

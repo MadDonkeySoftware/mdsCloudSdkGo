@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 // IdentityClient Client to interact with MDS Cloud identity service
@@ -40,9 +39,9 @@ func (ic *IdentityClient) getHTTPClient() *http.Client {
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
-		client = &http.Client{Timeout: 10 * time.Second, Transport: tr}
+		client = &http.Client{Timeout: API_TIMEOUT, Transport: tr}
 	} else {
-		client = &http.Client{Timeout: 10 * time.Second}
+		client = &http.Client{Timeout: API_TIMEOUT}
 	}
 
 	return client

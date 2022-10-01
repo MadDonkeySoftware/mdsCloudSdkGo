@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 // FileServiceClient Client to interact with the MDS Cloud container service
@@ -28,7 +27,7 @@ type CreateContainerResult struct {
 
 // CreateContainer Attempts to create a new container with the MDS Cloud deployment
 func (cs *FileServiceClient) CreateContainer(data *CreateContainerArgs) (*CreateContainerResult, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/createContainer/%s", cs.fileServiceURL, data.Name), nil)
 	if err != nil {
@@ -79,7 +78,7 @@ type ListContainerContentsResult struct {
 
 // ListContainerContents Attempts to create a new container with the MDS Cloud deployment
 func (cs *FileServiceClient) ListContainerContents(data *ListContainerContentsArgs) (*ListContainerContentsResult, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v1/list/%s", cs.fileServiceURL, data.Orid), nil)
 	if err != nil {
@@ -122,7 +121,7 @@ type DeleteContainerArgs struct {
 
 // DeleteContainerOrPath Attempts to delete a container or path within a container in the MDS Cloud deployment
 func (cs *FileServiceClient) DeleteContainerOrPath(data *DeleteContainerArgs) error {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	body, err := json.Marshal(data)
 	if err != nil {

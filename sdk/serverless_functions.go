@@ -40,7 +40,7 @@ type ServerlessFunctionDetails struct {
 
 // CreateFunction Create a new serverless function
 func (c *ServerlessFunctionsClient) CreateFunction(name string) (*ServerlessFunctionSummary, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	token, err := c.authManager.GetAuthenticationToken(nil)
 	if err != nil {
@@ -87,7 +87,7 @@ func (c *ServerlessFunctionsClient) CreateFunction(name string) (*ServerlessFunc
 
 // ListFunctions List the available functions
 func (c *ServerlessFunctionsClient) ListFunctions() (*[]ServerlessFunctionSummary, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	token, err := c.authManager.GetAuthenticationToken(nil)
 	if err != nil {
@@ -126,7 +126,7 @@ func (c *ServerlessFunctionsClient) ListFunctions() (*[]ServerlessFunctionSummar
 
 // DeleteFunction .
 func (c *ServerlessFunctionsClient) DeleteFunction(orid string) error {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	token, err := c.authManager.GetAuthenticationToken(nil)
 	if err != nil {
@@ -193,7 +193,7 @@ func (c *ServerlessFunctionsClient) InvokeFunction(orid string, body interface{}
 
 // GetFunctionDetails Gets details for a function
 func (c *ServerlessFunctionsClient) GetFunctionDetails(orid string) (*ServerlessFunctionDetails, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	token, err := c.authManager.GetAuthenticationToken(nil)
 	if err != nil {

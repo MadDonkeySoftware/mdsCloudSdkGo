@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 // StateMachineServiceClient Client to interact with the MDS Cloud state machine service
@@ -28,7 +27,7 @@ type CreateStateMachineResult struct {
 
 // CreateStateMachine Attempts to create a new state machine within the MDS Cloud deployment
 func (cs *StateMachineServiceClient) CreateStateMachine(data *CreateStateMachineArgs) (*CreateStateMachineResult, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	// body, err := json.Marshal(data)
 	// if err != nil {
@@ -84,7 +83,7 @@ type GetStateMachineDetailsResult struct {
 
 // GetStateMachineDetails Attempts to fetch the details of a state machine within the MDS Cloud deployment
 func (cs *StateMachineServiceClient) GetStateMachineDetails(data *GetStateMachineDetailsArgs) (*GetStateMachineDetailsResult, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v1/machine/%s", cs.stateMachineServiceURL, data.Orid), nil)
 	if err != nil {
@@ -133,7 +132,7 @@ type UpdateStateMachineResult struct {
 
 // UpdateStateMachine Attempts to create a new state machine within the MDS Cloud deployment
 func (cs *StateMachineServiceClient) UpdateStateMachine(data *UpdateStateMachineArgs) (*UpdateStateMachineResult, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	body := bytes.NewBuffer([]byte(data.Definition))
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/machine/%s", cs.stateMachineServiceURL, data.Orid), body)
@@ -182,7 +181,7 @@ type DeleteStateMachineResult struct {
 
 // DeleteStateMachine Attempts to delete a state machine within the MDS Cloud deployment
 func (cs *StateMachineServiceClient) DeleteStateMachine(data *DeleteStateMachineArgs) (*DeleteStateMachineResult, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: API_TIMEOUT}
 
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/v1/machine/%s", cs.stateMachineServiceURL, data.Orid), nil)
 	if err != nil {

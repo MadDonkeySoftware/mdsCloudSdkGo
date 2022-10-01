@@ -109,9 +109,9 @@ func (am *AuthManager) getNewToken(account string, userName string, password str
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
-		client = &http.Client{Timeout: 10 * time.Second, Transport: tr}
+		client = &http.Client{Timeout: API_TIMEOUT, Transport: tr}
 	} else {
-		client = &http.Client{Timeout: 10 * time.Second}
+		client = &http.Client{Timeout: API_TIMEOUT}
 	}
 
 	body := []byte(fmt.Sprintf(`{"accountId":"%s","userId":"%s","password":"%s"}`, account, userName, password))
