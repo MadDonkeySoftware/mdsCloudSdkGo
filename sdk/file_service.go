@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -31,7 +31,7 @@ func (cs *FileServiceClient) CreateContainer(data *CreateContainerArgs) (*Create
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/createContainer/%s", cs.fileServiceURL, data.Name), nil)
 	if err != nil {
-		return nil, errors.New("Could not build request to create container")
+		return nil, errors.New("could not build request to create container")
 	}
 
 	token, err := cs.authManager.GetAuthenticationToken(nil)
@@ -60,8 +60,8 @@ func (cs *FileServiceClient) CreateContainer(data *CreateContainerArgs) (*Create
 	case 409:
 		return nil, errors.New("container already exists")
 	default:
-		body, _ := ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ := io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -82,7 +82,7 @@ func (cs *FileServiceClient) ListContainerContents(data *ListContainerContentsAr
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v1/list/%s", cs.fileServiceURL, data.Orid), nil)
 	if err != nil {
-		return nil, errors.New("Could not build request to create container")
+		return nil, errors.New("could not build request to create container")
 	}
 
 	token, err := cs.authManager.GetAuthenticationToken(nil)
@@ -109,8 +109,8 @@ func (cs *FileServiceClient) ListContainerContents(data *ListContainerContentsAr
 
 		return &payload, nil
 	default:
-		body, _ := ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ := io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -130,7 +130,7 @@ func (cs *FileServiceClient) DeleteContainerOrPath(data *DeleteContainerArgs) er
 
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/v1/%s", cs.fileServiceURL, data.Orid), bytes.NewBuffer(body))
 	if err != nil {
-		return errors.New("Could not build request to create container")
+		return errors.New("could not build request to create container")
 	}
 
 	token, err := cs.authManager.GetAuthenticationToken(nil)
@@ -150,7 +150,7 @@ func (cs *FileServiceClient) DeleteContainerOrPath(data *DeleteContainerArgs) er
 	case 204:
 		return nil
 	default:
-		body, _ = ioutil.ReadAll(r.Body)
-		return fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ = io.ReadAll(r.Body)
+		return fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }

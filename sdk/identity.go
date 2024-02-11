@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -58,7 +58,7 @@ func (ic *IdentityClient) Register(data *RegisterAccountArgs) (*RegisterResult, 
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/register", ic.identityURL), bytes.NewBuffer(body))
 	if err != nil {
-		return nil, errors.New("Could not build request to register user")
+		return nil, errors.New("could not build request to register user")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -73,12 +73,12 @@ func (ic *IdentityClient) Register(data *RegisterAccountArgs) (*RegisterResult, 
 		payload := RegisterResult{}
 		err = json.NewDecoder(r.Body).Decode(&payload)
 		if err != nil {
-			return nil, errors.New("Could not decode response from API of resource")
+			return nil, errors.New("could not decode response from API of resource")
 		}
 		return &payload, nil
 	default:
-		body, _ = ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ = io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -134,7 +134,7 @@ func (ic *IdentityClient) UpdateUser(data *UpdateUserArgs) error {
 		return err
 	}
 	if err != nil {
-		return errors.New("Could not build request to register user")
+		return errors.New("could not build request to register user")
 	}
 
 	token, err := ic.authManager.GetAuthenticationToken(nil)
@@ -154,8 +154,8 @@ func (ic *IdentityClient) UpdateUser(data *UpdateUserArgs) error {
 	case 200:
 		return nil
 	default:
-		body, _ = ioutil.ReadAll(r.Body)
-		return fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ = io.ReadAll(r.Body)
+		return fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -180,7 +180,7 @@ func (ic *IdentityClient) ImpersonateUser(data *ImpersonateUserArgs) (*Impersona
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/impersonate", ic.identityURL), bytes.NewBuffer(body))
 	if err != nil {
-		return nil, errors.New("Could not build request to register user")
+		return nil, errors.New("could not build request to register user")
 	}
 
 	token, err := ic.authManager.GetAuthenticationToken(nil)
@@ -201,12 +201,12 @@ func (ic *IdentityClient) ImpersonateUser(data *ImpersonateUserArgs) (*Impersona
 		payload := ImpersonateUserResult{}
 		err = json.NewDecoder(r.Body).Decode(&payload)
 		if err != nil {
-			return nil, errors.New("Could not decode response from API of resource")
+			return nil, errors.New("could not decode response from API of resource")
 		}
 		return &payload, nil
 	default:
-		body, _ = ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ = io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -236,11 +236,11 @@ func (ic *IdentityClient) GetPublicSignature() (*PublicSignatureResponse, error)
 		payload := PublicSignatureResponse{}
 		err = json.NewDecoder(r.Body).Decode(&payload)
 		if err != nil {
-			return nil, errors.New("Could not decode response from API of resource")
+			return nil, errors.New("could not decode response from API of resource")
 		}
 		return &payload, nil
 	default:
-		body, _ := ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ := io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }

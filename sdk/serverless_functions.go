@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -44,20 +43,20 @@ func (c *ServerlessFunctionsClient) CreateFunction(name string) (*ServerlessFunc
 
 	token, err := c.authManager.GetAuthenticationToken(nil)
 	if err != nil {
-		return nil, errors.New("Could not acquire authentication token")
+		return nil, errors.New("could not acquire authentication token")
 	}
 
 	body := []byte(fmt.Sprintf(`{"name":"%s"}`, name))
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/create", c.serviceURL), bytes.NewBuffer(body))
 	if err != nil {
-		return nil, errors.New("Could not build request to create new function")
+		return nil, errors.New("could not build request to create new function")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
-		return nil, errors.New("Could not execute request to create new function")
+		return nil, errors.New("could not execute request to create new function")
 	}
 	defer r.Body.Close()
 
@@ -67,7 +66,7 @@ func (c *ServerlessFunctionsClient) CreateFunction(name string) (*ServerlessFunc
 		err = json.NewDecoder(r.Body).Decode(&function)
 		if err != nil {
 			fmt.Println(err)
-			return nil, errors.New("Could not decode response from API of resource")
+			return nil, errors.New("could not decode response from API of resource")
 		}
 		data := ServerlessFunctionSummary{
 			Name: name,
@@ -75,13 +74,13 @@ func (c *ServerlessFunctionsClient) CreateFunction(name string) (*ServerlessFunc
 		}
 		return &data, nil
 	case 400:
-		body, _ = ioutil.ReadAll(r.Body)
+		body, _ = io.ReadAll(r.Body)
 		return nil, errors.New(string(body))
 	case 409:
-		return nil, fmt.Errorf("Function with name \"%s\" appears to already exist", name)
+		return nil, fmt.Errorf("function with name \"%s\" appears to already exist", name)
 	default:
-		body, _ = ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ = io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -91,18 +90,18 @@ func (c *ServerlessFunctionsClient) ListFunctions() (*[]ServerlessFunctionSummar
 
 	token, err := c.authManager.GetAuthenticationToken(nil)
 	if err != nil {
-		return nil, errors.New("Could not acquire authentication token")
+		return nil, errors.New("could not acquire authentication token")
 	}
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v1/list", c.serviceURL), nil)
 	if err != nil {
-		return nil, errors.New("Could not build request to fetch list of functions from API")
+		return nil, errors.New("could not build request to fetch list of functions from API")
 	}
 
 	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
-		return nil, errors.New("Could not execute request to fetch list of functions from serverless functions API")
+		return nil, errors.New("could not execute request to fetch list of functions from serverless functions API")
 	}
 	defer r.Body.Close()
 
@@ -110,7 +109,7 @@ func (c *ServerlessFunctionsClient) ListFunctions() (*[]ServerlessFunctionSummar
 	err = json.NewDecoder(r.Body).Decode(&apiFunctions)
 	if err != nil {
 		fmt.Println(err)
-		return nil, errors.New("Could not decode response from API of resource")
+		return nil, errors.New("could not decode response from API of resource")
 	}
 
 	functions := make([]ServerlessFunctionSummary, 0)
@@ -130,18 +129,18 @@ func (c *ServerlessFunctionsClient) DeleteFunction(orid string) error {
 
 	token, err := c.authManager.GetAuthenticationToken(nil)
 	if err != nil {
-		return errors.New("Could not acquire authentication token")
+		return errors.New("could not acquire authentication token")
 	}
 
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/v1/%s", c.serviceURL, orid), nil)
 	if err != nil {
-		return errors.New("Could not build request to delete function")
+		return errors.New("could not build request to delete function")
 	}
 
 	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
-		return errors.New("Could not execute request to delete function")
+		return errors.New("could not execute request to delete function")
 	}
 	defer r.Body.Close()
 
@@ -149,8 +148,8 @@ func (c *ServerlessFunctionsClient) DeleteFunction(orid string) error {
 	case 204:
 		return nil
 	default:
-		body, _ := ioutil.ReadAll(r.Body)
-		return fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ := io.ReadAll(r.Body)
+		return fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -160,34 +159,34 @@ func (c *ServerlessFunctionsClient) InvokeFunction(orid string, body interface{}
 
 	token, err := c.authManager.GetAuthenticationToken(nil)
 	if err != nil {
-		return nil, errors.New("Could not acquire authentication token")
+		return nil, errors.New("could not acquire authentication token")
 	}
 
 	bodyBytes, _ := json.Marshal(body)
 	payload := bytes.NewReader(bodyBytes)
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/invoke/%s", c.serviceURL, orid), payload)
 	if err != nil {
-		return nil, errors.New("Could not build request to invoke function")
+		return nil, errors.New("could not build request to invoke function")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
-		return nil, errors.New("Could not execute request to invoke function")
+		return nil, errors.New("could not execute request to invoke function")
 	}
 	defer r.Body.Close()
 
 	switch r.StatusCode {
 	case 200:
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		return body, nil
 	case 400:
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		return nil, errors.New(string(body))
 	default:
-		body, _ := ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ := io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -197,18 +196,18 @@ func (c *ServerlessFunctionsClient) GetFunctionDetails(orid string) (*Serverless
 
 	token, err := c.authManager.GetAuthenticationToken(nil)
 	if err != nil {
-		return nil, errors.New("Could not acquire authentication token")
+		return nil, errors.New("could not acquire authentication token")
 	}
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v1/inspect/%s", c.serviceURL, orid), nil)
 	if err != nil {
-		return nil, errors.New("Could not build request to fetch function from API")
+		return nil, errors.New("could not build request to fetch function from API")
 	}
 
 	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
-		return nil, errors.New("Could not execute request to fetch function from serverless functions API")
+		return nil, errors.New("could not execute request to fetch function from serverless functions API")
 	}
 	defer r.Body.Close()
 
@@ -216,7 +215,7 @@ func (c *ServerlessFunctionsClient) GetFunctionDetails(orid string) (*Serverless
 	err = json.NewDecoder(r.Body).Decode(&function)
 	if err != nil {
 		fmt.Println(err)
-		return nil, errors.New("Could not decode response from API of resource")
+		return nil, errors.New("could not decode response from API of resource")
 	}
 
 	safeToString := func(data interface{}) string {
@@ -253,7 +252,7 @@ func (c *ServerlessFunctionsClient) UpdateFunctionCode(data *UpdateFunctionCodeA
 
 	token, err := c.authManager.GetAuthenticationToken(nil)
 	if err != nil {
-		return errors.New("Could not acquire authentication token")
+		return errors.New("could not acquire authentication token")
 	}
 
 	payload := &bytes.Buffer{}
@@ -280,14 +279,14 @@ func (c *ServerlessFunctionsClient) UpdateFunctionCode(data *UpdateFunctionCodeA
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/uploadCode/%s", c.serviceURL, data.Orid), payload)
 	if err != nil {
-		return errors.New("Could not build request to create new function")
+		return errors.New("could not build request to create new function")
 	}
 
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	req.Header.Set("Token", token)
 	r, err := client.Do(req)
 	if err != nil {
-		return errors.New("Could not execute request to create new function")
+		return errors.New("could not execute request to create new function")
 	}
 	defer r.Body.Close()
 
@@ -297,7 +296,7 @@ func (c *ServerlessFunctionsClient) UpdateFunctionCode(data *UpdateFunctionCodeA
 		err = json.NewDecoder(r.Body).Decode(&result)
 		if err != nil {
 			fmt.Println(err)
-			return errors.New("Could not decode response from API of resource")
+			return errors.New("could not decode response from API of resource")
 		}
 
 		buildStatus := result["status"].(string)
@@ -307,10 +306,10 @@ func (c *ServerlessFunctionsClient) UpdateFunctionCode(data *UpdateFunctionCodeA
 
 		return nil
 	case 400:
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		return errors.New(string(body))
 	default:
-		body, _ := ioutil.ReadAll(r.Body)
-		return fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ := io.ReadAll(r.Body)
+		return fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }

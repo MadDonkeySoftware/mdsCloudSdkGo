@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math"
 	"net/http"
 	"time"
@@ -84,7 +84,7 @@ func (am *AuthManager) getAuthenticationTokenWork(overrides map[string]string) (
 			return "", err
 		}
 
-		// NOTE: Add a 60 second buffer to ensure calls will succeed.
+		// NOTE: Add a 60-second buffer to ensure calls will succeed.
 		nowSec := time.Now().Unix() + 60
 		expSec := int64(math.Floor(claims["exp"].(float64)))
 		if nowSec < expSec {
@@ -117,7 +117,7 @@ func (am *AuthManager) getNewToken(account string, userName string, password str
 	body := []byte(fmt.Sprintf(`{"accountId":"%s","userId":"%s","password":"%s"}`, account, userName, password))
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/authenticate", am.identityURL), bytes.NewBuffer(body))
 	if err != nil {
-		return "", errors.New("Could not build request to authenticate user")
+		return "", errors.New("could not build request to authenticate user")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -133,11 +133,11 @@ func (am *AuthManager) getNewToken(account string, userName string, password str
 		payload := make(map[string]interface{})
 		err = json.NewDecoder(r.Body).Decode(&payload)
 		if err != nil {
-			return "", errors.New("Could not decode response from API of resource")
+			return "", errors.New("could not decode response from API of resource")
 		}
 		return payload["token"].(string), nil
 	default:
-		body, _ = ioutil.ReadAll(r.Body)
-		return "", fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ = io.ReadAll(r.Body)
+		return "", fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -40,7 +40,7 @@ func (qs *QueueServiceClient) CreateQueue(data *CreateQueueArgs) (*CreateQueueRe
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/queue", qs.queueServiceURL), bytes.NewBuffer(body))
 	if err != nil {
-		return nil, errors.New("Could not build request to create queue")
+		return nil, errors.New("could not build request to create queue")
 	}
 
 	token, err := qs.authManager.GetAuthenticationToken(nil)
@@ -75,8 +75,8 @@ func (qs *QueueServiceClient) CreateQueue(data *CreateQueueArgs) (*CreateQueueRe
 
 		return &payload, nil
 	default:
-		body, _ = ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ = io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -93,7 +93,7 @@ func (qs *QueueServiceClient) DeleteQueue(data *DeleteQueueArgs) error {
 
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/v1/queue/%s", qs.queueServiceURL, data.Orid), nil)
 	if err != nil {
-		return errors.New("Could not build request to delete queue")
+		return errors.New("could not build request to delete queue")
 	}
 
 	token, err := qs.authManager.GetAuthenticationToken(nil)
@@ -113,8 +113,8 @@ func (qs *QueueServiceClient) DeleteQueue(data *DeleteQueueArgs) error {
 	case 204:
 		return nil
 	default:
-		body, _ := ioutil.ReadAll(r.Body)
-		return fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ := io.ReadAll(r.Body)
+		return fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -140,7 +140,7 @@ func (qs *QueueServiceClient) GetQueueDetails(data *GetQueueDetailsArgs) (*GetQu
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v1/queue/%s/details", qs.queueServiceURL, data.Orid), nil)
 	if err != nil {
-		return nil, errors.New("Could not build request to delete queue")
+		return nil, errors.New("could not build request to delete queue")
 	}
 
 	token, err := qs.authManager.GetAuthenticationToken(nil)
@@ -168,8 +168,8 @@ func (qs *QueueServiceClient) GetQueueDetails(data *GetQueueDetailsArgs) (*GetQu
 		payload.Orid = data.Orid
 		return &payload, nil
 	default:
-		body, _ := ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ := io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -215,7 +215,7 @@ func (qs *QueueServiceClient) UpdateQueue(data *UpdateQueueArgs) error {
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/queue/%s", qs.queueServiceURL, data.Orid), bytes.NewBuffer(body))
 	if err != nil {
-		return errors.New("Could not build request to create queue")
+		return errors.New("could not build request to create queue")
 	}
 
 	token, err := qs.authManager.GetAuthenticationToken(nil)
@@ -235,7 +235,7 @@ func (qs *QueueServiceClient) UpdateQueue(data *UpdateQueueArgs) error {
 	case 200:
 		return nil
 	default:
-		body, _ = ioutil.ReadAll(r.Body)
-		return fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ = io.ReadAll(r.Body)
+		return fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }

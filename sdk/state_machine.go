@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -37,7 +37,7 @@ func (cs *StateMachineServiceClient) CreateStateMachine(data *CreateStateMachine
 	body := bytes.NewBuffer([]byte(data.Definition))
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/machine", cs.stateMachineServiceURL), body)
 	if err != nil {
-		return nil, errors.New("Could not build request to create state machine")
+		return nil, errors.New("could not build request to create state machine")
 	}
 
 	token, err := cs.authManager.GetAuthenticationToken(nil)
@@ -64,8 +64,8 @@ func (cs *StateMachineServiceClient) CreateStateMachine(data *CreateStateMachine
 
 		return &payload, nil
 	default:
-		body, _ := ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ := io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -87,7 +87,7 @@ func (cs *StateMachineServiceClient) GetStateMachineDetails(data *GetStateMachin
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v1/machine/%s", cs.stateMachineServiceURL, data.Orid), nil)
 	if err != nil {
-		return nil, errors.New("Could not build request to get state machine details")
+		return nil, errors.New("could not build request to get state machine details")
 	}
 
 	token, err := cs.authManager.GetAuthenticationToken(nil)
@@ -114,8 +114,8 @@ func (cs *StateMachineServiceClient) GetStateMachineDetails(data *GetStateMachin
 
 		return &payload, nil
 	default:
-		body, _ := ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ := io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -137,7 +137,7 @@ func (cs *StateMachineServiceClient) UpdateStateMachine(data *UpdateStateMachine
 	body := bytes.NewBuffer([]byte(data.Definition))
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/machine/%s", cs.stateMachineServiceURL, data.Orid), body)
 	if err != nil {
-		return nil, errors.New("Could not build request to create state machine")
+		return nil, errors.New("could not build request to create state machine")
 	}
 
 	token, err := cs.authManager.GetAuthenticationToken(nil)
@@ -164,8 +164,8 @@ func (cs *StateMachineServiceClient) UpdateStateMachine(data *UpdateStateMachine
 
 		return &payload, nil
 	default:
-		body, _ := ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ := io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
 
@@ -185,7 +185,7 @@ func (cs *StateMachineServiceClient) DeleteStateMachine(data *DeleteStateMachine
 
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/v1/machine/%s", cs.stateMachineServiceURL, data.Orid), nil)
 	if err != nil {
-		return nil, errors.New("Could not build request to create state machine")
+		return nil, errors.New("could not build request to create state machine")
 	}
 
 	token, err := cs.authManager.GetAuthenticationToken(nil)
@@ -212,7 +212,7 @@ func (cs *StateMachineServiceClient) DeleteStateMachine(data *DeleteStateMachine
 
 		return &payload, nil
 	default:
-		body, _ := ioutil.ReadAll(r.Body)
-		return nil, fmt.Errorf("Did not understand response from API: %d, %s", r.StatusCode, string(body))
+		body, _ := io.ReadAll(r.Body)
+		return nil, fmt.Errorf("did not understand response from API: %d, %s", r.StatusCode, string(body))
 	}
 }
